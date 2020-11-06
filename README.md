@@ -16,7 +16,7 @@ import pygmiscores as scores
 
 scores.set_game_id(...)    # Get your game ID from the gmiscores website(e.g. 16)
 scores.set_secret(...)    # Get your secret from the gmiscores website
-# The secret isn't required if
+# The secret isn't required if you're not submitting new scores, only reading
 
 scores.add('Vegeta', 9001)  # Add a record for Vegeta, with a score of 9001
 
