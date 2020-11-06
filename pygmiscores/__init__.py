@@ -130,8 +130,6 @@ class Scores:
             if val is None:
                 del data[key]
 
-        print(data)
-
         return requests.get('{}/list.php'.format(self.upstream), params=data)
 
     def list(self, game_id=None, page=0, perpage=10,
