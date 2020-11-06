@@ -98,7 +98,7 @@ class Scores:
                   if not specified self.game_id will be used
 
         Return a requests.models.Response containing the response of
-        the server. For a parsed result see list().
+        the server. For a parsed result see list_parsed().
         Return a dictionary containing the status message returned
         by the server and a list of scores. The format can be seen at
         https://gmiscores.altervista.org/documentation.php.
@@ -132,9 +132,9 @@ class Scores:
 
         return requests.get('{}/list.php'.format(self.upstream), params=data)
 
-    def list(self, game_id=None, page=0, perpage=10,
-             order=ScoreOrder.DESCENDING, player=None, start_time=None,
-             end_time=None, include_username=None):
+    def list_parsed(self, game_id=None, page=0, perpage=10,
+                    order=ScoreOrder.DESCENDING, player=None, start_time=None,
+                    end_time=None, include_username=None):
         """Get a list of scores(parsed).
         Note that this request is synchronous, run it in a separate
         thread when used in real time applications.
@@ -159,3 +159,11 @@ class Scores:
         return json.loads(self.list_raw(
             page, perpage, order, player, start_time, end_time,
             include_username, game_id).text)
+
+
+# Instantiate one client and export methods to module level
+_inst = Scores()
+
+add = _inst.add
+list_raw = _inst.list_raw
+list_parsed = _inst.list_parsed
