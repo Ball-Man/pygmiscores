@@ -1,5 +1,6 @@
 import enum
 import hashlib
+import json
 import base64
 import requests
 
@@ -14,6 +15,12 @@ class SubmitMode(enum.Enum):
     ALL = 'all'
     HIGHER = 'higher'
     LOWER = 'lower'
+
+
+class ScoreOrder(enum.Enum):
+    """Order types for scores."""
+    ASCENDING = 'ASC'
+    DESCENDING = 'DESC'
 
 
 class Scores:
@@ -43,7 +50,9 @@ class Scores:
         score - The score of the player
         mode - The submit mode (see SubmitMode)
         game_id - The game_id (from https://gmiscores.altervista.org)
+                  if not specified, self.game_id will be used
         secret - The game secret (from https://gmiscores.altervista.org)
+                 if not specified, self.secret will be used
 
         A request.model.Response instance.
         """
@@ -67,3 +76,88 @@ class Scores:
 
         return requests.post('{}/add.php'.format(self.upstream),
                              data=data)
+
+    def list_raw(self, game_id=None, page=0, perpage=10,
+                 order=ScoreOrder.DESCENDING, player=None, start_time=None,
+                 end_time=None, include_username=None):
+        """Get a list of scores(unparsed).
+        Note that this request is synchronous, run it in a separate
+        thread when used in real time applications.
+
+        page - The leaderboard page to inspect(only one page at a time)
+        perpage - The number of records for page(max 1000)
+        order - The score order(ascending, descending, see ScoreOrder)
+        player - ID or username of a player. If given, only this
+                 player's scores will be returned
+        start_time - Filter by date(format 'yyyy-mm-dd [hh:ss:ms]')
+        end_time - Filter by date(same format of start_time)
+        include_username - name of a player. If given, this player's
+                           best score(based on order, start_time,
+                           end_time) will be added to the final list.
+        game_id - The game_id from https://gmiscores.altervista.org/
+                  if not specified self.game_id will be used
+
+        Return a requests.models.Response containing the response of
+        the server. For a parsed result see list().
+        Return a dictionary containing the status message returned
+        by the server and a list of scores. The format can be seen at
+        https://gmiscores.altervista.org/documentation.php.
+        """
+        if game_id is None:
+            game_id = self.game_id
+
+        if type(player) is str:
+            player = base64.b64encode(player.encode()).decode()
+
+        if include_username is not None:
+            include_username = \
+                base64.b64encode(include_username.encode()).decode()
+
+        # Compose query string(payload)
+        data = {
+            'game': int(game_id),
+            'page': int(page),
+            'limit': int(perpage),
+            'order': order,
+            'player': player,
+            'startTime': start_time,
+            'endTime': end_time,
+            'includePlayer': include_username,
+        }
+
+        # Removed unspecified ones
+        for key, val in list(data.items()):
+            if val is None:
+                del data[key]
+
+        print(data)
+
+        return requests.get('{}/list.php'.format(self.upstream), params=data)
+
+    def list(self, game_id=None, page=0, perpage=10,
+             order=ScoreOrder.DESCENDING, player=None, start_time=None,
+             end_time=None, include_username=None):
+        """Get a list of scores(parsed).
+        Note that this request is synchronous, run it in a separate
+        thread when used in real time applications.
+
+        page - The leaderboard page to inspect(only one page at a time)
+        perpage - The number of records for page(max 1000)
+        order - The score order(ascending, descending, see ScoreOrder)
+        player - ID or username of a player. If given, only this
+                 player's scores will be returned
+        start_time - Filter by date(format 'yyyy-mm-dd [hh:ss:ms]')
+        end_time - Filter by date(same format of start_time)
+        include_username - name of a player. If given, this player's
+                           best score(based on order, start_time,
+                           end_time) will be added to the final list.
+        game_id - The game_id from https://gmiscores.altervista.org/
+                  if not specified self.game_id will be used
+
+        Return a dictionary containing the status message returned
+        by the server and a list of scores. The format can be seen at
+        https://gmiscores.altervista.org/documentation.php.
+        """
+        return json.loads(self.list_raw(
+            page, perpage, order, player, start_time, end_time,
+            include_username, game_id).text)
