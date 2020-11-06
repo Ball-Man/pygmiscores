@@ -40,6 +40,14 @@ class Scores:
         self.secret = secret
         self.game_id = game_id
 
+    def set_game_id(self, game_id):
+        """Set the game id for this instance."""
+        self.game_id = game_id
+
+    def set_secret(self, secret):
+        """Set the game secret for this instance."""
+        self.secret = secret
+
     def add(self, username, score, mode=SubmitMode.ALL,
                      game_id=None, secret=None):
         """Submit a score online.
@@ -157,13 +165,16 @@ class Scores:
         https://gmiscores.altervista.org/documentation.php.
         """
         return json.loads(self.list_raw(
-            page, perpage, order, player, start_time, end_time,
-            include_username, game_id).text)
+            page=page, perpage=perpage, order=order, player=player,
+            start_time=start_time, end_time=end_time,
+            include_username=include_username, game_id=game_id).text)
 
 
 # Instantiate one client and export methods to module level
 _inst = Scores()
 
+set_game_id = _inst.set_game_id
+set_secret = _inst.set_secret
 add = _inst.add
 list_raw = _inst.list_raw
 list_parsed = _inst.list_parsed
