@@ -40,7 +40,7 @@ class Scores:
         self.secret = secret
         self.game_id = game_id
 
-    def submit_score(self, username, score, mode=SubmitMode.ALL,
+    def add(self, username, score, mode=SubmitMode.ALL,
                      game_id=None, secret=None):
         """Submit a score online.
         Note that this request is synchronous, run it in a separate
