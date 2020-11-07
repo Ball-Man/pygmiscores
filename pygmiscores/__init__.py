@@ -48,13 +48,18 @@ class Scores:
         self.secret = secret
         self.game_id = game_id
 
-    def set_game_id(self, game_id):
-        """Set the game id for this instance."""
-        self.game_id = game_id
+    def game(self, game_id=None, secret=None):
+        """Set the game id and secret for this instance, if given.
 
-    def set_secret(self, secret):
-        """Set the game secret for this instance."""
-        self.secret = secret
+        Return the pair current (game_id, secret).
+        """
+        if game_id is not None:
+            self.game_id = game_id
+
+        if secret is not None:
+            self.secret = secret
+
+        return self.game_id, self.secret
 
     def add_raw(self, username, score, mode=SubmitMode.ALL,
                 game_id=None, secret=None):
@@ -203,8 +208,7 @@ class Scores:
 # Instantiate one client and export methods to module level
 _inst = Scores()
 
-set_game_id = _inst.set_game_id
-set_secret = _inst.set_secret
+game = _inst.game
 add_raw = _inst.add_raw
 add = _inst.add
 list_raw = _inst.list_raw

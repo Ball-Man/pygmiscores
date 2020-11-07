@@ -14,11 +14,12 @@ The library can be used by manually instantiating the `Scores` class. When a sin
 ```py
 import pygmiscores as scores
 
-scores.set_game_id(...)    # Get your game ID from the gmiscores website(e.g. 16)
-scores.set_secret(...)    # Get your secret from the gmiscores website
+# Get your game ID and secret from the gmiscores website(e.g. 16)
+# and insert them here.
+scores.game(game_id=..., secret=...)
 # The secret isn't required if you're not submitting new scores, only reading
 
-scores.add('Vegeta', 9001)  # Add a record for Vegeta, with a score of 9001
+scores.add('Vegeta', 9001)    # Add a record for Vegeta, with a score of 9001
 
 print(scores.list_parsed())   # Get the top 10
 ```
